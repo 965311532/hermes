@@ -1,4 +1,4 @@
-afrom setuptools import setup, find_packages
+from setuptools import setup, find_packages
 import hermes
 
 with open('./README.md' , 'r', encoding = 'utf-8') as f:
@@ -6,8 +6,8 @@ with open('./README.md' , 'r', encoding = 'utf-8') as f:
 
 setup(
     name='hermes',
-    version=mt5.__version__,
-    author=mt5.__author__,
+    version=hermes.__version__,
+    author=hermes.__author__,
     author_email='contact@gabrielearmento.com',
     description='A signal parser to understand human trading signals',
     long_description_content_type='text/markdown',

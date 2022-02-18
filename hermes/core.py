@@ -1,4 +1,4 @@
-from aliases import aliases
+from .aliases import aliases
 from typing import Union, Callable
 import re, logging
 
@@ -74,7 +74,7 @@ def search_close(text: str):
         "support",
         "been",
     ]
-    
+
     if "clos" in text.lower():
         if all(x not in text.lower() for x in blacklist):
             if len(text) <= 100:
