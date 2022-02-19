@@ -25,14 +25,17 @@ class Hermes:
     def preprocess(self, text: str) -> str:
         return text
 
-    def search_algo(self, algo: Callable, *args, allow_this_many=1) -> list:
+    def search_algo(
+        self, algo: Callable, *args, allow_this_many=1
+    ) -> Union[list, None, str]:
         result_algo = algo(self.text, *args)
         log.debug(f"doing {algo.__name__}, found {result_algo}")
         if isinstance(result_algo, list):
             if len(result_algo) > allow_this_many:
                 raise TooManyFeatures(f"{algo.__name__} = {result_algo}", self.text)
-            return result_algo
-        return list(result_algo)
+            if len(result_algo) == 1:
+                result_algo = result_algo[0]
+        return result_algo if result_algo else None
 
 
 def search_regex(text: str, regex: str) -> Union[None, list]:
@@ -78,8 +81,8 @@ def search_close(text: str):
     if "clos" in text.lower():
         if all(x not in text.lower() for x in blacklist):
             if len(text) <= 100:
-                return [text]
-    return list()
+                return text
+    return None
 
 
 def interpret(text: str) -> dict:
@@ -110,13 +113,16 @@ def interpret(text: str) -> dict:
         data["flag"] = "POSITION"
 
     else:
-        allowed = "partials breakeven move_sl close".split(" ")
+        allowed = "tp partials breakeven move_sl close".split(" ")
         try:
-            data["flag"] = [x for x in data if (data[x] and x in allowed)][0].upper()
-        except IndexError:
-            data["flag"] = None
+            data["flag"] = [f"update_{x}" for x in data if (data[x] and x in allowed)][
+                0
+            ].upper()
+        except IndexError:  # none of the allowed keywords are in data
+            pass
 
-    return data
+    # only return data that is actually present
+    return {k: v for k, v in data.items() if v}
 
 
 def main():
