@@ -25,16 +25,16 @@ class Hermes:
     def preprocess(self, text: str) -> str:
         return text
 
-    def search_algo(
-        self, algo: Callable, *args, allow_this_many=1
-    ) -> Union[list, None, str]:
+    def search_algo(self, algo: Callable, *args, allow_max=1) -> Union[list, None, str]:
         result_algo = algo(self.text, *args)
-        log.debug(f"doing {algo.__name__}, found {result_algo}")
         if isinstance(result_algo, list):
-            if len(result_algo) > allow_this_many:
+            if len(result_algo) > allow_max:
                 raise TooManyFeatures(f"{algo.__name__} = {result_algo}", self.text)
             if len(result_algo) == 1:
                 result_algo = result_algo[0]
+
+        if result_algo:
+            log.debug(f"doing {algo.__name__}, found {result_algo}")
         return result_algo if result_algo else None
 
 
@@ -101,7 +101,7 @@ def interpret(text: str) -> dict:
         "symbol": hermes.search_algo(search_symbol),
         "entry": hermes.search_algo(search_regex, ENTRY),
         "sl": hermes.search_algo(search_regex, SL),
-        "tp": hermes.search_algo(search_regex, TP, allow_this_many=10),
+        "tp": hermes.search_algo(search_regex, TP, allow_max=10),
         "side": hermes.search_algo(search_regex, SIDE),
         "partials": hermes.search_algo(search_regex, PARTIALS),
         "breakeven": hermes.search_algo(search_regex, BREAKEVEN),
