@@ -3,7 +3,7 @@ from typing import Union, Callable
 import re, logging
 
 logging.basicConfig()
-log = logging.getLogger("hermes")
+log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 
@@ -105,15 +105,14 @@ def interpret(text: str) -> dict:
         "side": hermes.search_algo(search_regex, SIDE),
         "partials": hermes.search_algo(search_regex, PARTIALS),
         "breakeven": hermes.search_algo(search_regex, BREAKEVEN),
-        "move_sl": hermes.search_algo(search_regex, MOVE_SL),
         "close": hermes.search_algo(search_close),
     }
 
     if data["symbol"] and data["sl"] and data["side"]:
         data["flag"] = "POSITION"
 
-    else:
-        allowed = "tp partials breakeven move_sl close".split(" ")
+    else:  # these are updates
+        allowed = "tp partials breakeven close".split(" ")
         try:
             data["flag"] = [f"update_{x}" for x in data if (data[x] and x in allowed)][
                 0
